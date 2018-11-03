@@ -35,24 +35,27 @@ class StdOutListener(StreamListener):
     """
     def __init__(self, retrieved_tweets_filename):
         self.retrieved_tweets_filename = retrieved_tweets_filename
-        
+    
     tweets=[]
-
+    
     def on_data(self, data):
+        tweetdata = []
         try:
             #print(data)
             with open(self.retrieved_tweets_filename, 'a') as tf:
-                tf.write(data)
+                tf.write(data)        
+                tweetdata += data
+            tweets.append(tweetdata)
             return True
         except BaseException as e:
             print("Error on_data %s" % str(e))
         return True
-        tweets.append(self.retrieved_tweets_filename)                                  #Im attempting to create list tweets which will be called in the tweets to data frame function.
-
+        
+        print(tweets)
+    
     def on_error(self, status):
         print(status)
           
-    
 class TweetAnalyzer():
     """
     Functionality for analyzing and categorizing content from tweets.
@@ -74,13 +77,17 @@ if __name__ == '__main__':
     # Authenticate using config.py and connect to Twitter Streaming API.
     tweet_subject = ["$TSLA", "Elon Musk"]
     retrievedd_tweets_filename = "Tesla_tweets.csv"
+    
+    tweets = StdOutListener.tweets
 
     twitter_streamer = TwitterStreamer()
     twitter_streamer.stream_tweets(retrievedd_tweets_filename, tweet_subject)
     
+    
     tweet_analyzer = TweetAnalyzer()
     df = tweet_analyzer.tweets_to_data_frame(tweets)
-    print(df.head())
+    print(df.head(10))
+    
   
 
 
